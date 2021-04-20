@@ -1,0 +1,640 @@
+<div class="header">
+	<div class="container-fluid">
+		<div class="header-body">
+			<div class="row align-items-center py-4">
+				<div class="col-lg-6 col-7">
+					<h6 class="h2 text-dark d-inline-block mb-0">Team Management</h6>
+
+					<nav aria-label="breadcrumb" class=" d-none d-md-inline-block ml-md-4">
+						<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+							<li class=" breadcrumb-item">
+								<a href="javascript:void(0)"> <i class="fas fa-users text-dark"> </i> </a>
+							</li>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:void(0)" class="text-dark"> Team Management </a>
+                            </li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container-fluid">
+    <div class="row row">
+        <div class="col col-sm-6">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Number of Team per Location</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div class="amchart" id="chartTeamDistrib"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col col-sm-6">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Number of Team based on Team Member</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div class="amchart" id="chartTotTeamMem"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Teams List</h3>
+                </div>
+                <div class="dataTables_wrapper py-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_length" id="datatable_length">
+                                <label>
+                                    Show
+                                    <select 
+                                        name="datatable_length"
+                                        aria-controls="datatable"
+                                        class="form-control form-control-sm"
+                                        (change)="entriesChange($event)"
+                                    >
+                                        <option value="5" [selected]="tableEntries==5">5</option>
+                                        <option value="10" [selected]="tableEntries==10">10</option>
+                                        <option value="15" [selected]="tableEntries==15">15</option>
+                                        <option value="-1" [selected]="tableEntries==-1">All</option>
+                                    </select>
+                                    records
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-5">
+                            <div id="datatable_filter" class="dataTables_filter">
+                                <label>
+                                    <input 
+                                        type="search"
+                                        class="form-control form-control-sm"
+                                        placeholder="Search records"
+                                        aria-controls="datatable"
+                                        (keyup)="filterTable($event)" 
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        <div class= "col-sm-12 col-md-1 pb-4">
+                            <a class="btn btn-success text-white" (click)="openModal1(regEditTeam)">Register</a>
+                        </div>
+                    </div>
+                    <div class="row"><div class="col">
+                    <ngx-datatable 
+                        class="bootstrap selection-cell"
+                        [columnMode]="'force'"
+                        [headerHeight]="50"
+                        [footerHeight]="50" 
+                        [rowHeight]="'auto'"
+                        [selected]="tableSelected"
+                        [selectionType]="'multiClick'"
+                        [limit]="tableEntries != -1 ? tableEntries:undefined"
+                        [rows]="tableTemp" 
+                        (activate)="onActivate($event)"
+                    >
+
+                        <ngx-datatable-column name="teamName">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Team Name</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.teamName}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="leaderName">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Team Leader</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.leaderName}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="teamLoc">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Current Location</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.teamLoc}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="teamTask">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Current Task</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.teamTask}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="teamStat">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Team Status</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <span *ngIf="row.teamStat == 1" class="badge badge-pill badge-success">New</span>
+                                <span *ngIf="row.teamStat == 2" class="badge badge-pill badge-danger">OnTask</span>
+                                <span *ngIf="row.teamStat == 3" class="badge badge-pill badge-secondary">Waiting</span>
+                                <span *ngIf="row.teamStat == 4" class="badge badge-pill badge-success">Idle</span>
+                                <span *ngIf="row.teamStat == 5" class="badge badge-pill badge-warning">Disbanded</span>
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column>
+                            <ng-template ngx-datatable-header-template>
+                                <span>View/Edit</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <a class="btn btn-sm btn-info" (click)="openModal0(viewTeam)">
+                                    <i class="fas fa-eye text-dark"></i>
+                                </a>
+                                <a class="btn btn-sm btn-success" (click)="openModal1(regEditTeam)">
+                                    <i class="fas fa-edit text-white"></i>
+                                </a>
+                                <a class="btn btn-sm btn-warning">
+                                    <i class="fas fa-trash text-white"></i>
+                                </a>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Staff List</h3>
+                </div>
+                <div class="dataTables_wrapper py-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="dataTables_length" id="datatable_length">
+                                <label>
+                                    Show
+                                    <select 
+                                        name="datatable_length"
+                                        aria-controls="datatable"
+                                        class="form-control form-control-sm"
+                                        (change)="entriesTChange($event)"
+                                    >
+                                        <option value="5" [selected]="tEntries==5">5</option>
+                                        <option value="10" [selected]="tEntries==10">10</option>
+                                        <option value="15" [selected]="tEntries==15">15</option>
+                                        <option value="-1" [selected]="tEntries==-1">All</option>
+                                    </select>
+                                    records
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div id="datatable_filter" class="dataTables_filter">
+                              <label>
+                                <input
+                                  type="search"
+                                  class="form-control form-control-sm"
+                                  placeholder="Search records"
+                                  aria-controls="datatable"
+                                  (keyup)="filterTTable($event)"
+                                />
+                              </label>
+                            </div>
+                          </div>
+                        <div class= "col-sm-12 col-md-2 pb-4">
+                            <a class="btn btn-success text-white" (click)="openModal1(regEditStaff)">Register</a>
+                        </div>-
+                    </div>
+                    <div class="row"><div class="col">
+                    <ngx-datatable 
+                        class="bootstrap selection-cell"
+                        [columnMode]="'force'"
+                        [headerHeight]="50"
+                        [footerHeight]="50" 
+                        [rowHeight]="'auto'"
+                        [limit]="tEntries != -1 ? tEntries:undefined"
+                        [rows]="tTemp" 
+                        [selected]="tSelected"
+                        [selectionType]="'multiClick'"
+                        (activate)="onActivate($event)"
+                    >
+
+                        <ngx-datatable-column name="staffName">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Staff Name</span>
+                            </ng-template>
+                            <!--<ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.staffName}}
+                            </ng-template>-->
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="location">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Staff Location</span>
+                            </ng-template>
+                            <!--<ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.location}}
+                            </ng-template>-->
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="contact">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Staff Contact</span>
+                            </ng-template>
+                            <!--<ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.contact}}
+                            </ng-template>-->
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="position">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Position</span>
+                            </ng-template>
+                            <!--<ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.position}}
+                            </ng-template>-->
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="status">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Staff Status</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <span *ngIf="row.status == 1" class="badge badge-pill badge-info">Staff</span>
+                                <span *ngIf="row.status == 2" class="badge badge-pill badge-danger">Engineer</span>
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column>
+                            <ng-template ngx-datatable-header-template>
+                                <span>Edit/Delete</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <a class="btn btn-sm btn-success" (click)="openModal1(regEditStaff)">
+                                    <i class="fas fa-edit text-white"></i>
+                                </a>
+                                <a class="btn btn-sm btn-warning">
+                                    <i class="fas fa-trash text-white"></i>
+                                </a>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #viewTeam>
+    <div class="modal-header bg-default">
+        <h6 class="modal-title text-white my-auto" id="compInfo">
+            Team Information
+        </h6>
+
+        <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            <span aria-hidden="true" class="text-white my-auto">&times; </span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Team Name</label>
+                    <input class="form-control" placeholder="Eagle7"
+                        formControlName="compName" type="text" disabled>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Region Assigned</label>
+                    <input class="form-control" placeholder="Kuala Lumpur"
+                        formControlName="regNo" type="text" disabled>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Team Leader</label>
+                    <input class="form-control" placeholder="Mr. Hafizi Imran"
+                        formControlName="regDate" type="text" disabled>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Contact Information</label>
+                    <input class="form-control" placeholder="hafiziimran@pipeline.com"
+                        formControlName="contInfo" type="text" disabled>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">No.</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Position</th>
+                            <th scope="col">Skills</th>
+                            <th scope="col">Contact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Ali</td>
+                            <td>Atas</td>
+                            <td>Bijak</td>
+                            <td>ali@pipeline.com</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>Abu</td>
+                            <td>Bawah</td>
+                            <td>Kurang Bijak</td>
+                            <td>abu@pipeline.com</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>Angah</td>
+                            <td>Tengah</td>
+                            <td>Idjit</td>
+                            <td>angah@pipeline.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header bg-secondary">
+                        <h3 class="m-0">SLA Achievement</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart">
+                            <div class="amchart" id="chartTeamSLA"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+
+    <div class="modal-footer">
+        <button
+            class="btn btn-outline-danger ml-auto"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            Close
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #regEditTeam>
+    <div class="modal-header bg-default">
+        <h6 class="modal-title text-white my-auto" id="compInfo">
+            Team Information
+        </h6>
+
+        <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            <span aria-hidden="true" class="text-white my-auto">&times; </span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Team Name</label>
+                    <input class="form-control" placeholder="Team Name"
+                        formControlName="compName" type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Region Assigned</label>
+                    <input class="form-control" placeholder="Region Assigned"
+                        formControlName="regNo" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Team Leader</label>
+                    <input class="form-control" placeholder="Team Leader"
+                        formControlName="regDate" type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Contact Information</label>
+                    <input class="form-control" placeholder="Contact Information"
+                        formControlName="contInfo" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Current Team Members</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No.</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Position</th>
+                                    <th scope="col">Skills</th>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Remove from Team</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Abu</td>
+                                    <td>Bawah</td>
+                                    <td>Kurang Bijak</td>
+                                    <td>abu@pipeline.com</td>
+                                    <td><button class="btn-sm btn-warning text-white">- Remove</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add Team Members</h4>
+                    </div>
+                    <div class="card-body">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No.</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Position</th>
+                                    <th scope="col">Skills</th>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Add to Team</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th scope="row">1</th>
+                                    <td>Ali</td>
+                                    <td>Atas</td>
+                                    <td>Bijak</td>
+                                    <td>ali@pipeline.com</td>
+                                    <td><button class="btn-sm btn-success text-white">+ Add</button></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">2</th>
+                                    <td>Abu</td>
+                                    <td>Bawah</td>
+                                    <td>Kurang Bijak</td>
+                                    <td>abu@pipeline.com</td>
+                                    <td><button class="btn-sm btn-success text-white">+ Add</button></td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">3</th>
+                                    <td>Angah</td>
+                                    <td>Tengah</td>
+                                    <td>Idjit</td>
+                                    <td>angah@pipeline.com</td>
+                                    <td><button class="btn-sm btn-success text-white">+ Add</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button
+            class="btn btn-outline-danger ml-auto"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            Close
+        </button>
+
+        <button 
+            class="btn btn-success"
+            type="button"
+        >
+            Register
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #regEditStaff>
+    <div class="modal-header bg-default">
+        <h6 class="modal-title text-white my-auto" id="compInfo">
+            Staff Information
+        </h6>
+        <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            <span aria-hidden="true" class="text-white my-auto">&times; </span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label">Name</label>
+                    <input class="form-control" placeholder="Name"
+                        formControlName="faultType" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Location</label>
+                    <input class="form-control" placeholder="Location"
+                        formControlName="desc" type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Contact</label>
+                    <input class="form-control" placeholder="Contact"
+                        formControlName="desc" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Position</label>
+                    <input class="form-control" placeholder="Position"
+                        formControlName="timeResp" type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Employee Status</label>
+                    <input class="form-control" placeholder="Employee Status"
+                        formControlName="timeResto" type="text">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button
+            class="btn btn-outline-danger ml-auto"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            Close
+        </button>
+
+        <button 
+            class="btn btn-success"
+            type="button"
+        >
+            Register
+        </button>
+    </div>
+</ng-template>

@@ -1,0 +1,408 @@
+<div class="header">
+	<div class="container-fluid">
+		<div class="header-body">
+			<div class="row align-items-center py-4">
+				<div class="col-lg-7 col-7">
+					<h6 class="h2 text-dark d-inline-block mb-0">SLA Control</h6>
+
+					<nav aria-label="breadcrumb" class=" d-none d-md-inline-block ml-md-4">
+						<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+							<li class=" breadcrumb-item">
+								<a href="javascript:void(0)"><i class="fas fa-star text-dark"></i> </a>
+							</li>
+                            <li class="breadcrumb-item">
+                                <a href="javascript:void(0)" class="text-dark"> Service Level Agreement Control </a>
+                            </li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container-fluid">
+    <div class="row row">
+        <div class="col col-sm-8">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">SLA Achievement per Priority</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div class="amchart" id="chartSLAAchieve"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col col-sm-4">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Number of Task per Priority</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div class="amchart" id="chartNumTaskPrio"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Priority List</h3>
+                </div>
+                <div class="dataTables_wrapper py-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-5">
+                            <div class="dataTables_length" id="datatable_length">
+                                <label>
+                                    Show
+                                    <select 
+                                        name="datatable_length"
+                                        aria-controls="datatable"
+                                        class="form-control form-control-sm"
+                                        (change)="entriesChange($event)"
+                                    >
+                                        <option value="5" [selected]="tableEntries==5">5</option>
+                                        <option value="10" [selected]="tableEntries==10">10</option>
+                                        <option value="15" [selected]="tableEntries==15">15</option>
+                                        <option value="-1" [selected]="tableEntries==-1">All</option>
+                                    </select>
+                                    records
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-5">
+                            <div id="datatable_filter" class="dataTables_filter">
+                                <label>
+                                    <input 
+                                        type="search"
+                                        class="form-control form-control-sm"
+                                        placeholder="Search records"
+                                        aria-controls="datatable"
+                                        (keyup)="filterTable($event)" 
+                                    />
+                                </label>
+                            </div>
+                        </div>
+                        <div class= "col-sm-12 col-md-1 pb-4">
+                            <a class="btn btn-success text-white" (click)="openModal(regEditPriority)">Register</a>
+                        </div>
+                    </div>
+                    <!--<div class="row"><div class="col">-->
+                    <ngx-datatable 
+                        class="bootstrap selection-cell"
+                        [columnMode]="'force'"
+                        [headerHeight]="50"
+                        [footerHeight]="50" 
+                        [rowHeight]="'auto'"
+                        [selected]="tableSelected"
+                        [selectionType]="'multiClick'"
+                        [limit]="tableEntries != -1 ? tableEntries:undefined"
+                        [rows]="tableTemp" 
+                        (activate)="onActivate($event)"
+                    >
+
+                        <ngx-datatable-column name="prioLvL">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Priority Level</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.prioLvL}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="prioDesc">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Description</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.prioDesc}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="faultType">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Type of Fault</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.faultType}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="timeResp">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Response Time</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.timeResp}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="timeResto">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Restoration Time</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.timeResto}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="timePermaFix">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Permanent Fix  Time</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.timePermaFix}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column>
+                            <ng-template ngx-datatable-header-template>
+                                <span>Edit/Delete</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <a class="btn btn-sm btn-success" (click)="openModal(regEditPriority)">
+                                    <i class="fas fa-edit text-white"></i>
+                                </a>
+                                <a class="btn btn-sm btn-warning">
+                                    <i class="fas fa-trash text-white"></i>
+                                </a>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                    <!--</div></div>-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Teams' SLA List</h3>
+                </div>
+                <div class="dataTables_wrapper py-4">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-9">
+                            <div class="dataTables_length" id="datatable_length">
+                                <label>
+                                    Show
+                                    <select 
+                                        name="datatable_length"
+                                        aria-controls="datatable"
+                                        class="form-control form-control-sm"
+                                        (change)="entriesChange1($event)"
+                                    >
+                                        <option value="5" [selected]="tEntries==5">5</option>
+                                        <option value="10" [selected]="tEntries==10">10</option>
+                                        <option value="15" [selected]="tEntries==15">15</option>
+                                        <option value="-1" [selected]="tEntries==-1">All</option>
+                                    </select>
+                                    records
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-3">
+                            <div class="row">
+                                <div id="datatable_filter" class="dataTables_filter">
+                                    <label>
+                                        <input 
+                                            type="search"
+                                            class="form-control form-control-sm"
+                                            placeholder="Search records"
+                                            aria-controls="datatable"
+                                            (keyup)="filterTable1($event)" 
+                                        />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row"><div class="col">
+                    <ngx-datatable 
+                        class="bootstrap selection-cell"
+                        [columnMode]="'force'"
+                        [headerHeight]="50"
+                        [footerHeight]="50" 
+                        [rowHeight]="'auto'"
+                        [selected]="tSelected"
+                        [selectionType]="'multiClick'"
+                        [limit]="tEntries != -1 ? tEntries:undefined"
+                        [rows]="tTemp" 
+                        (activate)="onActivate($event)"
+                    >
+                        <ngx-datatable-column name="teamName">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Team Name</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <a href=javascript:void(0) (click)="openModal(teamSLAChart)">{{row.teamName}}</a>
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="slaHigh">
+                            <ng-template ngx-datatable-header-template>
+                                <span>High</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.slaHigh}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="slaMed">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Medium</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.slaMed}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="slaLow">
+                            <ng-template ngx-datatable-header-template>
+                                <span>Low</span>
+                            </ng-template>
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                {{row.slaLow}}
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                    </div></div>
+                </div>
+            </div>
+        </div>
+        <!--<div class="col col-sm-4">
+            <div class="card">
+                <div class="card-header bg-secondary">
+                    <h3 class="m-0">Selected Team SLA Achievement</h3>
+                </div>
+                <div class="card-body">
+                    <div class="chart">
+                        <div class="amchart" id="chartSingleTeamSLA"></div>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+    </div>
+</div>
+
+<ng-template #regEditPriority>
+    <div class="modal-header bg-default">
+        <h6 class="modal-title text-white my-auto" id="compInfo">
+            Priority Information
+        </h6>
+        <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            <span aria-hidden="true" class="text-white my-auto">&times; </span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Priority Level</label>
+                    <input class="form-control" placeholder="Priority Level"
+                        formControlName="teamAsgn" type="text">
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="form-group">
+                    <label class="form-control-label">Type of Fault</label>
+                    <input class="form-control" placeholder="Type of Fault"
+                        formControlName="faultType" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="form-control-label">Description</label>
+                    <input class="form-control" placeholder="Description"
+                        formControlName="desc" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label class="form-control-label">Response Time</label>
+                    <input class="form-control" placeholder="Response Time"
+                        formControlName="timeResp" type="text">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label class="form-control-label">Restoration Time</label>
+                    <input class="form-control" placeholder="Restoration Time"
+                        formControlName="timeResto" type="text">
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="form-group">
+                    <label class="form-control-label">Permanent Fix Time</label>
+                    <input class="form-control" placeholder="Permanent Fix Time"
+                        formControlName="timePermaFix" type="text">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button
+            class="btn btn-outline-danger ml-auto"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            Close
+        </button>
+
+        <button 
+            class="btn btn-success"
+            type="button"
+        >
+            Register
+        </button>
+    </div>
+</ng-template>
+
+<ng-template #teamSLAChart>
+    <div class="modal-header bg-default">
+        <h6 class="modal-title text-white my-auto" id="compInfo">
+            Team SLA Achievement
+        </h6>
+        <button
+            aria-label="Close"
+            class="close"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            <span aria-hidden="true" class="text-white my-auto">&times; </span>
+        </button>
+    </div>
+
+    <div class="modal-body">
+        <div class="card">
+            <div class="card-header bg-secondary">
+                <h3 class="m-0">Selected Team SLA Achievement</h3>
+            </div>
+            <div class="card-body">
+                <div class="chart">
+                    <div class="amchart" id="chartSingleTeamSLA"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button
+            class="btn btn-outline-danger ml-auto"
+            data-dismiss="modal"
+            type="button"
+            (click)="closeModal()"
+        >
+            Close
+        </button>
+    </div>
+</ng-template>
